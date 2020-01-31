@@ -1,7 +1,7 @@
 const toCurrency = price => {
   return new Intl.NumberFormat("ru-RU", {
     currency: "rub",
-    style: "currency"
+    style: "currency",
   }).format(price);
 };
 
@@ -12,7 +12,7 @@ const toDate = date => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit"
+    second: "2-digit",
   }).format(new Date(date));
 };
 
@@ -31,7 +31,7 @@ if ($card) {
       const id = event.target.dataset.id;
 
       fetch("/card/remove/" + id, {
-        method: "delete"
+        method: "delete",
       })
         .then(res => res.json())
         .then(card => {
@@ -58,3 +58,5 @@ if ($card) {
     }
   });
 }
+
+M.Tabs.init(document.querySelectorAll(".tabs"));

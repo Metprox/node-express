@@ -6,6 +6,7 @@ const homeRoutes = require("./routes/home");
 const cardRoutes = require("./routes/card");
 const orderRoutes = require("./routes/orders");
 const addRoutes = require("./routes/add");
+const authRoutes = require("./routes/auth");
 const coursesRoutes = require("./routes/courses");
 const User = require("./models/user");
 
@@ -13,7 +14,7 @@ const app = express();
 
 const hbs = exphbs.create({
   defaultLayout: "main",
-  extname: "hbs"
+  extname: "hbs",
 });
 
 app.engine("hbs", hbs.engine);
@@ -38,6 +39,7 @@ app.use("/add", addRoutes);
 app.use("/courses", coursesRoutes);
 app.use("/card", cardRoutes);
 app.use("/orders", orderRoutes);
+app.use("/auth", authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
@@ -47,14 +49,14 @@ async function start() {
     await mongoose.connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: false
+      useFindAndModify: false,
     });
     const candidate = await User.findOne();
     if (!candidate) {
       const user = new User({
         email: "oleg@gmail.com",
         name: "Oleg",
-        cart: { items: [] }
+        cart: { items: [] },
       });
 
       await user.save();
