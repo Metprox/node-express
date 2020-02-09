@@ -1,7 +1,7 @@
 const toCurrency = price => {
   return new Intl.NumberFormat("ru-RU", {
     currency: "rub",
-    style: "currency",
+    style: "currency"
   }).format(price);
 };
 
@@ -12,7 +12,7 @@ const toDate = date => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
+    second: "2-digit"
   }).format(new Date(date));
 };
 
@@ -29,9 +29,13 @@ if ($card) {
   $card.addEventListener("click", event => {
     if (event.target.classList.contains("js-remove")) {
       const id = event.target.dataset.id;
+      const csrf = event.target.dataset.csrf;
 
       fetch("/card/remove/" + id, {
         method: "delete",
+        headers: {
+          "X-XSRF-TOKEN": csrf
+        }
       })
         .then(res => res.json())
         .then(card => {
@@ -43,7 +47,7 @@ if ($card) {
                 <td>${c.title}</td>
                 <td>${c.count}</td>
                 <td>
-                  <button class="btn btm-small js-remove" data-id="${c.id}">Удалить</button>
+                  <button class="btn btm-small js-remove" data-id="${c.id}" data-csrf="${csrf}">Удалить</button>
                 </td>
               </tr>
               `;
