@@ -7,7 +7,7 @@
             </ul>
         </div>
         <div id="login" class="col s6 offset-s3">
-            
+
             {{#if loginError}}
             <p class="alert">{{loginError}}</p>
             {{/if}}
@@ -28,13 +28,15 @@
 
                 <input type="hidden" name="_csrf" value="{{csrf}}">
 
+                <p><a href="/auth/reset">Забыли пароль</a></p>
+
                 <button type="submit" class="btn btn-primary">Войти</button>
             </form>
         </div>
         <div id="register" class="col s6 offset-s3">
             {{#if registerError}}
-             <p class="alert">{{registerError}}</p>
-            {{/if}} 
+            <p class="alert">{{registerError}}</p>
+            {{/if}}
 
             <h1>Создать аккаунт</h1>
             <form action="/auth/register" method="POST">
