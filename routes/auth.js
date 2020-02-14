@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { body, validationResult } = require("express-validator/check");
 const nodemailer = require("nodemailer");
 const sendgrid = require("nodemailer-sendgrid-transport");
 const User = require("../models/user");
@@ -61,10 +62,16 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", body("email").isEmail(), async (req, res) => {
   try {
-    const { email, password, repeat, name } = req.body;
+    const { email, password, confirm, name } = req.body;
     const candidate = await User.findOne({ email });
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      req.flash("registerError", errors.array()[0].msg);
+      return res.status(422).redirect("/auth/login#register");
+    }
 
     if (candidate) {
       req.flash("registerError", "Пользователен с таким email уже существует");
@@ -145,6 +152,29 @@ router.post("/reset", (req, res) => {
         res.redirect("/auth/reset");
       }
     });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/password", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      _id: req.body.userId,
+      resetToken: req.body.token,
+      resetTokenExp: { $qt: Date.now() }
+    });
+
+    if (user) {
+      user.password = await bcrypt.hash(req.body.password, 10);
+      user.resetToken = undefined;
+      user.resetTokenExp = undefined;
+      await user.save();
+      res.redirect("/auth/login");
+    } else {
+      req.flesh("loginError", "Время жизни токена истекло");
+      res.redirect("/auth/login");
+    }
   } catch (err) {
     console.log(err);
   }
