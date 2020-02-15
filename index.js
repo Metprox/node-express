@@ -3,6 +3,8 @@ const path = require("path");
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
+const compression = require("compression");
 const session = require("express-session");
 const MongoStore = require("connect-mongodb-session")(session);
 const exphbs = require("express-handlebars");
@@ -10,10 +12,13 @@ const homeRoutes = require("./routes/home");
 const cardRoutes = require("./routes/card");
 const orderRoutes = require("./routes/orders");
 const addRoutes = require("./routes/add");
+const profileRoutes = require("./routes/profile");
 const authRoutes = require("./routes/auth");
 const coursesRoutes = require("./routes/courses");
 const varMiddleware = require("./middleware/variables");
 const userMiddleware = require("./middleware/user");
+const errorHandler = require("./middleware/error");
+const fileMiddleware = require("./middleware/file");
 const keys = require("./keys");
 
 const app = express();
@@ -34,6 +39,7 @@ app.set("view engine", "hbs");
 app.set("views", "views");
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
@@ -44,8 +50,11 @@ app.use(
   })
 );
 
+app.use(fileMiddleware.single("avatar"));
 app.use(csrf());
 app.use(flash());
+app.use(helmet());
+app.use(compression());
 
 // Custom middleware
 
@@ -58,6 +67,10 @@ app.use("/courses", coursesRoutes);
 app.use("/card", cardRoutes);
 app.use("/orders", orderRoutes);
 app.use("/auth", authRoutes);
+app.use("/profile", profileRoutes);
+
+// 404
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
